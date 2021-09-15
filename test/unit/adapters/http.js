@@ -56,6 +56,26 @@ describe('supports http with nodejs', function () {
     });
   });
 
+   describe('when a header key matches an HTTP verb', function() {
+    it('preserves stringy header values', function(done) {
+      server = http.createServer(function (req, res) {
+        assert.equal('test', req.headers['delete'])
+        done()
+      }).listen(4444, function () {
+        axios.post('http://localhost:4444/foo', null, { 'headers': { 'delete': 'test' } });
+      })
+    });
+
+    it('nils header value when non-stringy', function(done) {
+      server = http.createServer(function (req, res) {
+        assert.equal(undefined, req.headers['delete'])
+        done()
+      }).listen(4444, function () {
+        axios.post('http://localhost:4444/foo', null, { 'headers': { 'delete': () => {} } });
+      })
+    });
+  });
+
   it('should allow passing JSON', function (done) {
     var data = {
       firstName: 'Fred',
